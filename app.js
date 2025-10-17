@@ -86,14 +86,49 @@ function renderCementTypes() {
     const grid = document.getElementById('cementTypesGrid');
     if (!grid) return;
     let filteredTypes = cementData.types;
-    if (currentFilter === 'lowEarly') { filteredTypes = cementData.types.filter(type => type.family.startsWith('CEM III')); }
-    else if (currentFilter !== 'all') { filteredTypes = cementData.types.filter(type => type.category === currentFilter); }
+
+    // --- THIS IS THE CRITICAL FIX ---
+    if (currentFilter === 'lowEarly') {
+        filteredTypes = cementData.types.filter(type => type.family.startsWith('CEM III'));
+    } else if (currentFilter !== 'all') {
+        filteredTypes = cementData.types.filter(type => type.category === currentFilter);
+    }
+    // --- END OF FIX ---
+
     if (searchTerm) {
         const searchLower = searchTerm.trim().toLowerCase();
-        if (searchLower.length > 0) { filteredTypes = filteredTypes.filter(type => [type.name, type.family, type.description, ...type.applications].join(' ').toLowerCase().includes(searchLower)); }
+        if (searchLower.length > 0) {
+            filteredTypes = filteredTypes.filter(type => {
+                const searchableText = [type.name, type.family, type.description, ...type.applications].join(' ').toLowerCase();
+                return searchableText.includes(searchLower);
+            });
+        }
     }
-    grid.innerHTML = filteredTypes.map(type => `<div class="card" onclick="showCementTypeDetails('${type.id}')"><div class="card-header"><div><div class="card-title">${type.name}</div><div class="card-subtitle">${type.family} Family</div></div><div class="card-icon"><i class="fas fa-cube"></i></div></div><div class="card-content"><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p>${type.description}</p><div class="composition-bar">${renderCompositionBar(type.composition)}</div><p style="color: var(--primary-blue); font-weight: 500; margin-top: 15px;"><i class="fas fa-mouse-pointer"></i> Click for details & calculator</p></div><div class="card-tags">${type.applications.slice(0, 2).map(app => `<span class="tag">${app}</span>`).join('')}${type.applications.length > 2 ? `<span class="tag">+${type.applications.length - 2} more</span>` : ''}</div></div>`).join('');
+    
+    grid.innerHTML = filteredTypes.map(type => `
+        <div class="card" onclick="showCementTypeDetails('${type.id}')">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">${type.name}</div>
+                    <div class="card-subtitle">${type.family} Family</div>
+                </div>
+                <div class="card-icon"><i class="fas fa-cube"></i></div>
+            </div>
+            <div class="card-content">
+                <p><strong>Clinker:</strong> ${type.clinker}</p>
+                ${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}
+                <p>${type.description}</p>
+                <div class="composition-bar">${renderCompositionBar(type.composition)}</div>
+                <p style="color: var(--primary-blue); font-weight: 500; margin-top: 15px;"><i class="fas fa-mouse-pointer"></i> Click for details & calculator</p>
+            </div>
+            <div class="card-tags">
+                ${type.applications.slice(0, 2).map(app => `<span class="tag">${app}</span>`).join('')}
+                ${type.applications.length > 2 ? `<span class="tag">+${type.applications.length - 2} more</span>` : ''}
+            </div>
+        </div>
+    `).join('');
 }
+
 
 function renderCompositionBar(composition) {
     if (!composition) return '';
@@ -156,7 +191,29 @@ function showConstituentDetails(symbol) { const c = cementData.constituents.find
 
 function showStrengthClassDetails(className) { const sc = cementData.strengthClasses[className]; if (!sc) return; const content = `<h2 style="color: var(--primary-blue);">Strength Class ${className} MPa</h2>${Object.entries(sc.variants).map(([v, d]) => `<div style="background:var(--surface); padding:15px; border-radius:8px; margin-bottom:10px;"><h4>${className} ${v} - ${d.name}</h4><p><strong>Early Strength (${d.early_days}d):</strong> ≥${d.early_min} MPa</p><p><strong>Standard Strength (28d):</strong> ${d.standard_min}${d.standard_max ? ` - ${d.standard_max}` : '+'} MPa</p><p><strong>Setting Time:</strong> ≥${d.setting_time} min</p><h5>Applications:</h5><p>${d.applications.join(', ')}</p></div>`).join('')}`; openModal('detailModal', content); }
 
-function updateFilterCounts() { const counts = { all: cementData.types.length, common: cementData.types.filter(t => t.category === 'common').length, sulfate: cementData.types.filter(t => t.category === 'sulfate').length, lowEarly: cementData.types.filter(t=>t.family.startsWith('CEM III')).length }; document.getElementById('filterAll').textContent = `All Types (${counts.all})`; document.getElementById('filterCommon').textContent = `Common (${counts.common})`; document.getElementById('filterSulfate').textContent = `Sulfate Resistant (${counts.sulfate})`; document.getElementById('filterLowEarly').textContent = `Low Early Strength (${counts.lowEarly})`; }
+function initializeFilters() {
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newFilter = button.dataset.filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (newFilter === 'lowEarly-link') {
+                // This is the fix: scroll to the section
+                document.getElementById('cement-types').scrollIntoView({ behavior: 'smooth' });
+                // Then set the actual filter value
+                currentFilter = 'lowEarly';
+                // And activate the correct button visually
+                button.classList.add('active'); 
+            } else {
+                currentFilter = newFilter;
+                button.classList.add('active');
+            }
+            renderCementTypes();
+        });
+    });
+}
 
 function updateHeroStats() { document.getElementById('totalTypesCount').textContent = cementData.types.length; }
 
