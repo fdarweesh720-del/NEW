@@ -19,7 +19,6 @@ function initializeApp() {
     renderCementTypes(); renderConstituents(); renderStrengthClasses(); renderRequirements();
     window.addEventListener('scroll', updateScrollProgress);
     observeElements();
-    initializeMobileMenu();
 }
 
 function setTheme(theme) { currentTheme = theme; document.documentElement.setAttribute('data-theme', theme); }
@@ -28,20 +27,16 @@ function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); 
 function initializeNavigation() {
     const navLinksContainer = document.querySelector('.nav-links');
     const mobileMenu = document.getElementById('mobileMenu');
-    
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    
     navLinksContainer.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetElement = document.getElementById(link.getAttribute('href').substring(1));
             if (targetElement) { window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' }); }
-            // --- FIX: Close mobile menu on link click ---
             navLinksContainer.classList.remove('active');
             mobileMenu.classList.remove('active');
         });
     });
-
     mobileMenu.addEventListener('click', () => {
         navLinksContainer.classList.toggle('active');
         mobileMenu.classList.toggle('active');
@@ -113,10 +108,7 @@ function renderStrengthClasses() { const grid = document.getElementById('strengt
 function renderRequirements() { const grid = document.getElementById('requirementsGrid'); if (!grid) return; const requirements = [{ title: 'Chemical Requirements', icon: 'fas fa-flask', items: ['Loss on ignition', 'Insoluble residue', 'Sulfate content (SO₃)', 'Chloride content'] }, { title: 'Physical Requirements', icon: 'fas fa-ruler', items: ['Setting time', 'Soundness (Expansion)', 'Compressive strength', 'Fineness'] }]; grid.innerHTML = requirements.map(r => `<div class="card"><div class="card-header"><div><div class="card-title">${r.title}</div><div class="card-subtitle">BS EN 197-1:2011</div></div><div class="card-icon"><i class="${r.icon}"></i></div></div><div class="card-content"><ul style="margin: 0; padding-left: 20px;">${r.items.map(item => `<li>${item}</li>`).join('')}</ul></div></div>`).join(''); }
 
 function showCementTypeDetails(typeId) {
-    const type = cementData.types.find(t => t.id === typeId);
-    if (!type) return;
-
-    // --- RESTORED: Detailed strength variant grid ---
+    const type = cementData.types.find(t => t.id === typeId); if (!type) return;
     const strengthDetailsHTML = type.available_strength_classes.map(sc => {
         const classData = cementData.strengthClasses[sc];
         return `<div style="background: var(--surface); margin: 15px 0; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
@@ -139,7 +131,6 @@ function showCementTypeDetails(typeId) {
             </div>
         </div>`;
     }).join('');
-
     const content = `
         <h2 style="color: var(--primary-blue);">${type.name}</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
