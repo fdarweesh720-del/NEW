@@ -26,21 +26,31 @@ function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); 
 function initializeNavigation() {
     const navLinksContainer = document.querySelector('.nav-links');
     const mobileMenu = document.getElementById('mobileMenu');
+    
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    // Add click listeners to all nav links inside the container
     navLinksContainer.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetElement = document.getElementById(link.getAttribute('href').substring(1));
-            if (targetElement) { window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' }); }
+            if (targetElement) {
+                window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' });
+            }
+            // --- THIS IS THE FIX ---
+            // It removes the 'active' class from the menu and icon, closing it.
             navLinksContainer.classList.remove('active');
             mobileMenu.classList.remove('active');
         });
     });
+
+    // Listener for the hamburger icon itself
     mobileMenu.addEventListener('click', () => {
         navLinksContainer.classList.toggle('active');
         mobileMenu.classList.toggle('active');
     });
 }
+
 
 function initializeSearch() { document.getElementById('searchInput').addEventListener('input', (e) => { searchTerm = e.target.value; renderCementTypes(); renderConstituents(); }); }
 
