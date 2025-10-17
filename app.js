@@ -1,3 +1,4 @@
+// Application Data
 const cementData = {
     molecularWeights: { SO3: 80.06, CaSO4: 136.14, H2O: 18.015, get dihydrate() { return this.CaSO4 + (2 * this.H2O); }, get hemihydrate() { return this.CaSO4 + (0.5 * this.H2O); }, get anhydrite() { return this.CaSO4; } },
     strengthClasses: { "32.5": { variants: { L: { name: "Low early strength", early_days: 7, early_min: 12.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["Mass concrete", "Dams"] }, N: { name: "Normal early strength", early_days: 7, early_min: 16.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["General construction", "Masonry"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 10.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["Fast construction", "Early demolding"] } } }, "42.5": { variants: { L: { name: "Low early strength", early_days: 7, early_min: 16.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Mass concrete structures", "Low heat"] }, N: { name: "Normal early strength", early_days: 2, early_min: 10.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Structural concrete", "Precast"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 20.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Fast construction", "Precast industry"] } } }, "52.5": { variants: { L: { name: "Low early strength", early_days: 2, early_min: 10.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["High-performance mass concrete"] }, N: { name: "Normal early strength", early_days: 2, early_min: 20.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["High-strength concrete", "Infrastructure"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 30.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["Prestressed concrete", "Fast-track projects"] } } } },
@@ -26,31 +27,21 @@ function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); 
 function initializeNavigation() {
     const navLinksContainer = document.querySelector('.nav-links');
     const mobileMenu = document.getElementById('mobileMenu');
-    
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    
-    // Add click listeners to all nav links inside the container
     navLinksContainer.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetElement = document.getElementById(link.getAttribute('href').substring(1));
-            if (targetElement) {
-                window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' });
-            }
-            // --- THIS IS THE FIX ---
-            // It removes the 'active' class from the menu and icon, closing it.
+            if (targetElement) { window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' }); }
             navLinksContainer.classList.remove('active');
             mobileMenu.classList.remove('active');
         });
     });
-
-    // Listener for the hamburger icon itself
     mobileMenu.addEventListener('click', () => {
         navLinksContainer.classList.toggle('active');
         mobileMenu.classList.toggle('active');
     });
 }
-
 
 function initializeSearch() { document.getElementById('searchInput').addEventListener('input', (e) => { searchTerm = e.target.value; renderCementTypes(); renderConstituents(); }); }
 
@@ -174,5 +165,3 @@ function updateCreditsInfo() { if (cementData.credits) { document.getElementById
 function updateScrollProgress() { const progressBar = document.getElementById('progressBar'); if (!progressBar) return; const scrollTop = window.pageYOffset || document.documentElement.scrollTop; const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight; progressBar.style.width = `${(scrollTop / docHeight) * 100}%`; }
 
 function observeElements() { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate-in'); } }); }, { threshold: 0.1 }); document.querySelectorAll('.card, .section-header, .stat').forEach(el => observer.observe(el)); }
-
-function initializeMobileMenu() { const mobileMenu = document.getElementById('mobileMenu'); const navLinks = document.querySelector('.nav-links'); if (mobileMenu) mobileMenu.addEventListener('click', () => { navLinks.classList.toggle('active'); mobileMenu.classList.toggle('active'); }); }
