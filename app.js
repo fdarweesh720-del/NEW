@@ -1,0 +1,214 @@
+const cementData = {
+    molecularWeights: { SO3: 80.06, CaSO4: 136.14, H2O: 18.015, get dihydrate() { return this.CaSO4 + (2 * this.H2O); }, get hemihydrate() { return this.CaSO4 + (0.5 * this.H2O); }, get anhydrite() { return this.CaSO4; } },
+    strengthClasses: { "32.5": { variants: { L: { name: "Low early strength", early_days: 7, early_min: 12.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["Mass concrete", "Dams"] }, N: { name: "Normal early strength", early_days: 7, early_min: 16.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["General construction", "Masonry"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 10.0, standard_min: 32.5, standard_max: 52.5, setting_time: 75, applications: ["Fast construction", "Early demolding"] } } }, "42.5": { variants: { L: { name: "Low early strength", early_days: 7, early_min: 16.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Mass concrete structures", "Low heat"] }, N: { name: "Normal early strength", early_days: 2, early_min: 10.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Structural concrete", "Precast"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 20.0, standard_min: 42.5, standard_max: 62.5, setting_time: 60, applications: ["Fast construction", "Precast industry"] } } }, "52.5": { variants: { L: { name: "Low early strength", early_days: 2, early_min: 10.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["High-performance mass concrete"] }, N: { name: "Normal early strength", early_days: 2, early_min: 20.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["High-strength concrete", "Infrastructure"] }, R: { name: "Rapid early strength", early_days: 2, early_min: 30.0, standard_min: 52.5, standard_max: null, setting_time: 45, applications: ["Prestressed concrete", "Fast-track projects"] } } } },
+    types: [ { id: 'cem1', name: 'CEM I', family: 'CEM I', category: 'common', clinker: '95-100%', description: 'Pure Portland cement', applications: ['Structural concrete', 'High early strength'], composition: { clinker: 95, minor: 5 }, max_so3: 4.0, chemical_requirements: { loss_on_ignition: "≤ 5.0%", insoluble_residue: "≤ 5.0%", sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-s', name: 'CEM II/A-S', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Slag', description: 'Portland-slag cement (6-20%)', applications: ['General construction', 'Mass concrete'], composition: { clinker: 87, slag: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-s', name: 'CEM II/B-S', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Slag', description: 'Portland-slag cement (21-35%)', applications: ['Durable construction', 'Sulfate environments'], composition: { clinker: 72, slag: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-d', name: 'CEM II/A-D', family: 'CEM II', category: 'common', clinker: '90-94%', additive: '6-10% Silica fume', description: 'Portland-silica fume', applications: ['High-performance concrete', 'Ultra-high strength'], composition: { clinker: 92, silicaFume: 8 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-p', name: 'CEM II/A-P', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Natural pozzolana', description: 'Portland-natural pozzolana (6-20%)', applications: ['Aggressive environments', 'Mass concrete'], composition: { clinker: 87, pozzolan: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-p', name: 'CEM II/B-P', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Natural pozzolana', description: 'Portland-natural pozzolana (21-35%)', applications: ['Harsh environments', 'Durability focus'], composition: { clinker: 72, pozzolan: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-q', name: 'CEM II/A-Q', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Calcined pozzolana', description: 'Portland-calcined pozzolana (6-20%)', applications: ['Chemical resistance', 'Hot climates'], composition: { clinker: 87, pozzolan: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-q', name: 'CEM II/B-Q', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Calcined pozzolana', description: 'Portland-calcined pozzolana (21-35%)', applications: ['Severe exposure', 'Infrastructure'], composition: { clinker: 72, pozzolan: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-v', name: 'CEM II/A-V', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Siliceous fly ash', description: 'Portland-siliceous fly ash (6-20%)', applications: ['Sustainable building', 'Long-term projects'], composition: { clinker: 87, flyAsh: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-v', name: 'CEM II/B-V', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Siliceous fly ash', description: 'Portland-siliceous fly ash (21-35%)', applications: ['Mass concrete', 'Eco-friendly construction'], composition: { clinker: 72, flyAsh: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-w', name: 'CEM II/A-W', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Calcareous fly ash', description: 'Portland-calcareous fly ash (6-20%)', applications: ['Infrastructure', 'Sustainable construction'], composition: { clinker: 87, flyAsh: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-w', name: 'CEM II/B-W', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Calcareous fly ash', description: 'Portland-calcareous fly ash (21-35%)', applications: ['Long-term applications', 'Sustainable projects'], composition: { clinker: 72, flyAsh: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-t', name: 'CEM II/A-T', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Burnt shale', description: 'Portland-burnt shale (6-20%)', applications: ['General construction', 'Regional availability'], composition: { clinker: 87, burntShale: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-t', name: 'CEM II/B-T', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Burnt shale', description: 'Portland-burnt shale (21-35%)', applications: ['Local construction', 'Economic construction'], composition: { clinker: 72, burntShale: 28 }, max_so3: 4.5, chemical_requirements: { sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-l', name: 'CEM II/A-L', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Limestone L', description: 'Portland-limestone L (6-20%)', applications: ['Architectural concrete', 'Precast elements'], composition: { clinker: 87, limestone: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-l', name: 'CEM II/B-L', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Limestone L', description: 'Portland-limestone L (21-35%)', applications: ['Mass concrete', 'Non-structural elements'], composition: { clinker: 72, limestone: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-ll', name: 'CEM II/A-LL', family: 'CEM II', category: 'common', clinker: '80-94%', additive: '6-20% Limestone LL', description: 'Portland-limestone LL (6-20%)', applications: ['General construction', 'Cost-effective solutions'], composition: { clinker: 87, limestone: 13 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-ll', name: 'CEM II/B-LL', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Limestone LL', description: 'Portland-limestone LL (21-35%)', applications: ['Mass concrete applications', 'Large projects'], composition: { clinker: 72, limestone: 28 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-a-m', name: 'CEM II/A-M', family: 'CEM II', category: 'common', clinker: '80-88%', additive: '12-20% Mixed', description: 'Portland-composite (12-20%)', applications: ['Versatile applications', 'General purpose'], composition: { clinker: 84, slag: 8, limestone: 8 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem2-b-m', name: 'CEM II/B-M', family: 'CEM II', category: 'common', clinker: '65-79%', additive: '21-35% Mixed', description: 'Portland-composite (21-35%)', applications: ['Multi-purpose use', 'Sustainable construction'], composition: { clinker: 72, slag: 14, flyAsh: 14 }, max_so3: 4.5, chemical_requirements: { sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem3-a', name: 'CEM III/A', family: 'CEM III', category: 'common', clinker: '35-64%', additive: '36-65% Slag', description: 'Blast furnace cement (36-65% slag)', applications: ['Marine structures', 'Chemical resistance'], composition: { clinker: 50, slag: 50 }, max_so3: 4.5, chemical_requirements: { loss_on_ignition: "≤ 5.0%", insoluble_residue: "≤ 5.0%", sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem3-b', name: 'CEM III/B', family: 'CEM III', category: 'common', clinker: '20-34%', additive: '66-80% Slag', description: 'High slag blast furnace cement (66-80%)', applications: ['Aggressive environments', 'Long-term strength'], composition: { clinker: 27, slag: 73 }, max_so3: 4.5, chemical_requirements: { loss_on_ignition: "≤ 5.0%", insoluble_residue: "≤ 5.0%", sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem3-c', name: 'CEM III/C', family: 'CEM III', category: 'common', clinker: '5-19%', additive: '81-95% Slag', description: 'Very high slag blast furnace cement (81-95%)', applications: ['Highly aggressive environments', 'Waste containment'], composition: { clinker: 12, slag: 88 }, max_so3: 4.5, chemical_requirements: { loss_on_ignition: "≤ 5.0%", insoluble_residue: "≤ 5.0%", sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem4-a', name: 'CEM IV/A', family: 'CEM IV', category: 'common', clinker: '65-89%', additive: '11-35% Pozzolan', description: 'Pozzolanic cement (11-35%)', applications: ['Hot climates', 'Alkali-silica mitigation'], composition: { clinker: 77, pozzolan: 23 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%", pozzolanicity_test: "must satisfy" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem4-b', name: 'CEM IV/B', family: 'CEM IV', category: 'common', clinker: '45-64%', additive: '36-55% Pozzolan', description: 'High pozzolanic cement (36-55%)', applications: ['Severe exposure', 'Thermal mass'], composition: { clinker: 55, pozzolan: 45 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%", pozzolanicity_test: "must satisfy" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem5-a', name: 'CEM V/A', family: 'CEM V', category: 'common', clinker: '40-64%', additive: '18-30% Slag + 18-30% Pozzolan', description: 'Composite cement (Slag + Pozzolan)', applications: ['Multi-exposure environments', 'Sustainable construction'], composition: { clinker: 52, slag: 24, pozzolan: 24 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem5-b', name: 'CEM V/B', family: 'CEM V', category: 'common', clinker: '20-38%', additive: '31-50% Slag + 31-50% Pozzolan', description: 'High replacement composite cement', applications: ['Highly aggressive environments', 'Infrastructure'], composition: { clinker: 29, slag: 35.5, pozzolan: 35.5 }, max_so3: 4.0, chemical_requirements: { sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem1-sr0', name: 'CEM I-SR 0', family: 'CEM I-SR', category: 'sulfate', clinker: '95-100%', description: 'Sulfate resisting Portland cement (C₃A = 0%)', applications: ['Severe sulfate environments', 'Seawater exposure'], composition: { clinker: 95, minor: 5 }, max_so3: 3.5, chemical_requirements: { c3a_limit: "C₃A = 0%", sulfate_content: "≤ 3.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem1-sr3', name: 'CEM I-SR 3', family: 'CEM I-SR', category: 'sulfate', clinker: '95-100%', description: 'Sulfate resisting Portland cement (C₃A ≤ 3%)', applications: ['Moderate sulfate environments', 'Marine foundations'], composition: { clinker: 95, minor: 5 }, max_so3: 3.5, chemical_requirements: { c3a_limit: "C₃A ≤ 3%", sulfate_content: "≤ 3.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem1-sr5', name: 'CEM I-SR 5', family: 'CEM I-SR', category: 'sulfate', clinker: '95-100%', description: 'Sulfate resisting Portland cement (C₃A ≤ 5%)', applications: ['Mild sulfate environments', 'Infrastructure projects'], composition: { clinker: 95, minor: 5 }, max_so3: 3.5, chemical_requirements: { c3a_limit: "C₃A ≤ 5%", sulfate_content: "≤ 3.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem4-a-sr', name: 'CEM IV/A-SR', family: 'CEM IV-SR', category: 'sulfate', clinker: '65-89%', additive: '11-35% Pozzolan', description: 'Sulfate resisting pozzolanic cement A', applications: ['Marine concrete', 'Sewage treatment plants'], composition: { clinker: 77, pozzolan: 23 }, max_so3: 4.0, chemical_requirements: { c3a_limit: "C₃A ≤ 9%", sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%", pozzolanicity_test: "Must satisfy at 8 days" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem4-b-sr', name: 'CEM IV/B-SR', family: 'CEM IV-SR', category: 'sulfate', clinker: '45-64%', additive: '36-55% Pozzolan', description: 'Sulfate resisting pozzolanic cement B', applications: ['Industrial structures', 'Long-term durability'], composition: { clinker: 55, pozzolan: 45 }, max_so3: 4.0, chemical_requirements: { c3a_limit: "C₃A ≤ 9%", sulfate_content: "≤ 4.0%", chloride: "≤ 0.10%", pozzolanicity_test: "Must satisfy at 8 days" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem3-b-sr', name: 'CEM III/B-SR', family: 'CEM III-SR', category: 'sulfate', clinker: '20-34%', additive: '66-80% Slag', description: 'Sulfate resisting blast furnace cement B', applications: ['Aggressive chemical conditions', 'Infrastructure'], composition: { clinker: 27, slag: 73 }, max_so3: 4.5, chemical_requirements: { c3a_limit: "No C₃A requirement", sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] }, { id: 'cem3-c-sr', name: 'CEM III/C-SR', family: 'CEM III-SR', category: 'sulfate', clinker: '5-19%', additive: '81-95% Slag', description: 'Sulfate resisting blast furnace cement C', applications: ['Extreme sulfate environments', 'Seawater structures'], composition: { clinker: 12, slag: 88 }, max_so3: 4.5, chemical_requirements: { c3a_limit: "No C₃A requirement", sulfate_content: "≤ 4.5%", chloride: "≤ 0.10%" }, available_strength_classes: ["32.5", "42.5", "52.5"] } ],
+    credits: { prepared_by: "Mr. Fadi M. Darwesh", email: "asrar.cement@gmail.com", checked_by: "Mr.Emil E.Batarseh", title: "Director of Northern Cement Laboratories" },
+    constituents: [ { symbol: 'K', name: 'Portland Cement Clinker', category: 'Primary Hydraulic', description: 'The main hydraulic constituent produced by sintering limestone and clay.', compounds: ['C₃S', 'C₂S', 'C₃A', 'C₄AF'], requirements: ['CaO content 60-67%'] }, { symbol: 'S', name: 'Granulated Blast Furnace Slag', category: 'Hydraulic', description: 'Latent hydraulic material from rapid cooling of molten slag.', compounds: ['Calcium silicate hydrates'], requirements: ['Glassy content ≥ 2/3', '(CaO + MgO)/SiO₂ > 1.0'] }, { symbol: 'P', name: 'Natural Pozzolan', category: 'Pozzolanic', description: 'Natural siliceous or aluminous material.', compounds: ['Reactive silica'], requirements: ['Reactive SiO₂ ≥ 25.0%'] }, { symbol: 'D', name: 'Silica Fume', category: 'High Performance', description: 'Very fine pozzolanic material from silicon metal production.', compounds: ['Amorphous SiO₂'], requirements: ['SiO₂ ≥ 85%', 'Specific surface ≥ 15.0 m²/g'] }, { symbol: 'V', name: 'Fly Ash', category: 'Pozzolanic', description: 'Fine powder from combustion of pulverized coal.', compounds: ['Siliceous glass'], requirements: ['Reactive SiO₂ ≥ 25.0%'] }, { symbol: 'W', name: 'Calcined Shale', category: 'Pozzolanic', description: 'Heat-treated clay-rich sedimentary rock.', compounds: ['Activated alumina', 'Reactive silica'], requirements: ['Compressive strength ≥ 25.0 MPa at 28 days'] }, { symbol: 'Q', name: 'Calcined Pozzolan', category: 'Pozzolanic', description: 'Heat-treated natural pozzolanic material.', compounds: ['Activated silica'], requirements: ['Reactive SiO₂ ≥ 25.0%'] }, { symbol: 'L', name: 'Limestone', category: 'Filler', description: 'Fine limestone powder acting as filler.', compounds: ['CaCO₃'], requirements: ['CaCO₃ ≥ 75%', 'TOC ≤ 0.50%'] }, { symbol: 'LL', name: 'Low Grade Limestone', category: 'Filler', description: 'Limestone with lower purity.', compounds: ['CaCO₃'], requirements: ['CaCO₃ ≥ 75%', 'TOC ≤ 0.20%'] }, { symbol: 'M', name: 'Other Mineral Additions', category: 'Various', description: 'Approved inorganic materials.', compounds: ['Variable'], requirements: ['Must meet performance criteria'] } ]
+};
+
+let currentTheme = 'light'; let currentFilter = 'all'; let searchTerm = '';
+
+document.addEventListener('DOMContentLoaded', () => initializeApp());
+
+function initializeApp() {
+    setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 500);
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+    initializeNavigation(); initializeSearch(); initializeFilters(); initializeModal();
+    updateFilterCounts(); updateHeroStats(); updateCreditsInfo();
+    renderCementTypes(); renderConstituents(); renderStrengthClasses(); renderRequirements();
+    window.addEventListener('scroll', updateScrollProgress);
+    observeElements();
+    initializeMobileMenu();
+}
+
+function setTheme(theme) { currentTheme = theme; document.documentElement.setAttribute('data-theme', theme); }
+function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); }
+
+function initializeNavigation() {
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetElement = document.getElementById(link.getAttribute('href').substring(1));
+            if (targetElement) { window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' }); }
+        });
+    });
+}
+
+function initializeSearch() { document.getElementById('searchInput').addEventListener('input', (e) => { searchTerm = e.target.value; renderCementTypes(); renderConstituents(); }); }
+
+function initializeFilters() {
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newFilter = button.dataset.filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (newFilter === 'lowEarly-link') {
+                document.getElementById('cement-types').scrollIntoView({ behavior: 'smooth' });
+                currentFilter = 'lowEarly';
+                document.querySelector('[data-filter="lowEarly-link"]').classList.add('active'); 
+            } else {
+                currentFilter = newFilter;
+                button.classList.add('active');
+            }
+            renderCementTypes();
+        });
+    });
+}
+
+function initializeModal() {
+    const detailModal = document.getElementById('detailModal');
+    const calculatorModal = document.getElementById('calculatorModal');
+    document.getElementById('modalClose').addEventListener('click', () => detailModal.style.display = 'none');
+    document.getElementById('calculatorModalClose').addEventListener('click', () => calculatorModal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+        if (e.target === detailModal) detailModal.style.display = 'none';
+        if (e.target === calculatorModal) calculatorModal.style.display = 'none';
+    });
+}
+
+function openModal(modalId, content) {
+    const modal = document.getElementById(modalId);
+    const contentContainer = modal.querySelector('.modal-content > div');
+    contentContainer.innerHTML = content;
+    modal.style.display = 'block';
+}
+
+function renderCementTypes() {
+    const grid = document.getElementById('cementTypesGrid');
+    if (!grid) return;
+    let filteredTypes = cementData.types;
+    if (currentFilter === 'lowEarly') { filteredTypes = cementData.types.filter(type => type.family.startsWith('CEM III')); }
+    else if (currentFilter !== 'all') { filteredTypes = cementData.types.filter(type => type.category === currentFilter); }
+    if (searchTerm) {
+        const searchLower = searchTerm.trim().toLowerCase();
+        if (searchLower.length > 0) { filteredTypes = filteredTypes.filter(type => [type.name, type.family, type.description, ...type.applications].join(' ').toLowerCase().includes(searchLower)); }
+    }
+    grid.innerHTML = filteredTypes.map(type => `<div class="card" onclick="showCementTypeDetails('${type.id}')"><div class="card-header"><div><div class="card-title">${type.name}</div><div class="card-subtitle">${type.family} Family</div></div><div class="card-icon"><i class="fas fa-cube"></i></div></div><div class="card-content"><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p>${type.description}</p><div class="composition-bar">${renderCompositionBar(type.composition)}</div><p style="color: var(--primary-blue); font-weight: 500; margin-top: 15px;"><i class="fas fa-mouse-pointer"></i> Click for details & calculator</p></div><div class="card-tags">${type.applications.slice(0, 2).map(app => `<span class="tag">${app}</span>`).join('')}${type.applications.length > 2 ? `<span class="tag">+${type.applications.length - 2} more</span>` : ''}</div></div>`).join('');
+}
+
+function renderCompositionBar(composition) {
+    if (!composition) return '';
+    const colors = { clinker: '#1e40af', slag: '#64748b', pozzolan: '#f97316', silicaFume: '#10b981', limestone: '#94a3b8', flyAsh: '#8b5cf6', burntShale: '#ef4444', mixed: '#6366f1', minor: '#a1a1aa' };
+    return Object.entries(composition).map(([component, percentage]) => `<div class="composition-segment" style="width: ${percentage}%; background-color: ${colors[component] || '#6b7280'};" title="${component.replace(/([A-Z])/g, ' $1').toLowerCase()}: ${percentage}%"></div>`).join('');
+}
+
+function renderConstituents() { const grid = document.getElementById('constituentsGrid'); if (!grid) return; grid.innerHTML = cementData.constituents.map(c => `<div class="card" onclick="showConstituentDetails('${c.symbol}')"><div class="card-header"><div><div class="card-title">${c.name}</div><div class="card-subtitle">Symbol: ${c.symbol} | ${c.category}</div></div><div class="card-icon"><i class="fas fa-atom"></i></div></div><div class="card-content"><p>${c.description}</p></div></div>`).join(''); }
+
+function renderStrengthClasses() { const grid = document.getElementById('strengthClassesGrid'); if (!grid) return; grid.innerHTML = Object.entries(cementData.strengthClasses).map(([name, data]) => `<div class="card" onclick="showStrengthClassDetails('${name}')"><div class="card-header"><div><div class="card-title">Class ${name}</div><div class="card-subtitle">${data.variants.N.standard_min}${data.variants.N.standard_max ? '-' + data.variants.N.standard_max : '+'} MPa</div></div><div class="card-icon"><i class="fas fa-weight-hanging"></i></div></div><div class="card-content"><p>Includes N, R, and L variants.</p></div></div>`).join(''); }
+
+function renderRequirements() { const grid = document.getElementById('requirementsGrid'); if (!grid) return; const requirements = [{ title: 'Chemical Requirements', icon: 'fas fa-flask', items: ['Loss on ignition', 'Insoluble residue', 'Sulfate content (SO₃)', 'Chloride content'] }, { title: 'Physical Requirements', icon: 'fas fa-ruler', items: ['Setting time', 'Soundness (Expansion)', 'Compressive strength', 'Fineness'] }]; grid.innerHTML = requirements.map(r => `<div class="card"><div class="card-header"><div><div class="card-title">${r.title}</div><div class="card-subtitle">BS EN 197-1:2011</div></div><div class="card-icon"><i class="${r.icon}"></i></div></div><div class="card-content"><ul style="margin: 0; padding-left: 20px;">${r.items.map(item => `<li>${item}</li>`).join('')}</ul></div></div>`).join(''); }
+
+function showCementTypeDetails(typeId) { const type = cementData.types.find(t => t.id === typeId); if (!type) return; const content = `<h2 style="color: var(--primary-blue);">${type.name}</h2><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;"><div><h4>Info</h4><p><strong>Family:</strong> ${type.family}</p><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p><strong>Category:</strong> ${type.category}</p></div><div><h4>Composition (Nucleus)</h4><div class="composition-bar">${renderCompositionBar(type.composition)}</div>${Object.entries(type.composition).map(([c, p]) => `<p><strong>${c.charAt(0).toUpperCase() + c.slice(1)}:</strong> ${p}%</p>`).join('')}</div></div><div style="margin-bottom: 20px;"><h4>Chemical Requirements</h4><div style="background: var(--surface); padding: 15px; border-radius: 8px;">${Object.entries(type.chemical_requirements || {}).map(([r, v]) => `<p><strong>${r.replace(/_/g, ' ').toUpperCase()}:</strong> ${v}</p>`).join('')}</div></div><div class="launch-calculator-btn" onclick="launchCalculator('${typeId}')"><i class="fas fa-calculator"></i> Launch Precision Calculator</div>`; openModal('detailModal', content); }
+
+function launchCalculator(typeId) { const type = cementData.types.find(t => t.id === typeId); if (!type) return; const inputsHTML = Object.keys(type.composition).map(key => `<div class="input-group"><label for="${key}_so3">SO₃ in ${key.charAt(0).toUpperCase() + key.slice(1)} (%)</label><input type="number" id="${key}_so3" value="0.5" step="0.01" min="0"></div>`).join(''); const content = `<h3>Calculator: ${type.name}</h3><p>Target Max SO₃: <strong>${type.max_so3}%</strong></p><div class="calculator-grid"><div><h4>Raw Material Inputs</h4>${inputsHTML}<div class="input-group"><label for="gypsum_purity">Gypsum Purity (%)</label><input type="number" id="gypsum_purity" value="90" step="0.1" min="0"></div><div class="input-group"><label for="gypsum_type">Gypsum Type</label><select id="gypsum_type"><option value="dihydrate">Dihydrate</option><option value="hemihydrate">Hemihydrate</option><option value="anhydrite">Anhydrite</option></select></div><button class="calculate-btn" onclick="calculatePreciseComposition('${typeId}')">Calculate</button></div><div id="calculatorResults"><h4>Results</h4><p>Fill inputs and click Calculate.</p></div></div>`; openModal('calculatorModal', content); }
+
+function calculatePreciseComposition(typeId) { const type = cementData.types.find(t => t.id === typeId); if (!type) return; const gypsumPurity = parseFloat(document.getElementById('gypsum_purity').value) / 100; const gypsumType = document.getElementById('gypsum_type').value; let so3FromNucleus = 0; for (const key in type.composition) { so3FromNucleus += (parseFloat(document.getElementById(`${key}_so3`).value) / 100) * type.composition[key]; } const requiredSO3FromGypsum = type.max_so3 - so3FromNucleus; if (requiredSO3FromGypsum < 0) { document.getElementById('calculatorResults').innerHTML = `<h4>Error</h4><p style="color:red;">SO₃ from raw materials (${so3FromNucleus.toFixed(2)}%) exceeds max limit of ${type.max_so3}%!</p>`; return; } const mw = cementData.molecularWeights; const totalGypsumToAdd = requiredSO3FromGypsum / ((mw.SO3 / mw[gypsumType]) * gypsumPurity); const nucleusPercentage = 100 - totalGypsumToAdd; const finalComposition = {}; for (const key in type.composition) { finalComposition[key] = type.composition[key] * (nucleusPercentage / 100); } let resultsHTML = `<h4>Final Composition</h4><p><strong>Required Gypsum: ${totalGypsumToAdd.toFixed(2)}%</strong></p><hr>`; for (const key in finalComposition) { resultsHTML += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${finalComposition[key].toFixed(2)}%</p>`; } resultsHTML += `<hr><p><strong>Total: ${(totalGypsumToAdd + Object.values(finalComposition).reduce((a, b) => a + b, 0)).toFixed(2)}%</strong></p>`; document.getElementById('calculatorResults').innerHTML = resultsHTML; }
+
+function showConstituentDetails(symbol) { const c = cementData.constituents.find(i => i.symbol === symbol); if (!c) return; const content = `<h2 style="color: var(--primary-blue);">${c.name}</h2><p><strong>Symbol:</strong> ${c.symbol} | <strong>Category:</strong> ${c.category}</p><p>${c.description}</p><h4>Main Compounds:</h4><ul>${c.compounds.map(i => `<li>${i}</li>`).join('')}</ul><h4>Requirements:</h4><ul>${c.requirements.map(i => `<li>${i}</li>`).join('')}</ul>`; openModal('detailModal', content); }
+
+function showStrengthClassDetails(className) { const sc = cementData.strengthClasses[className]; if (!sc) return; const content = `<h2 style="color: var(--primary-blue);">Strength Class ${className} MPa</h2>${Object.entries(sc.variants).map(([v, d]) => `<div style="background:var(--surface); padding:15px; border-radius:8px; margin-bottom:10px;"><h4>${className} ${v} - ${d.name}</h4><p><strong>Early Strength (${d.early_days}d):</strong> ≥${d.early_min} MPa</p><p><strong>Standard Strength (28d):</strong> ${d.standard_min}${d.standard_max ? ` - ${d.standard_max}` : '+'} MPa</p><p><strong>Setting Time:</strong> ≥${d.setting_time} min</p><h5>Applications:</h5><p>${d.applications.join(', ')}</p></div>`).join('')}`; openModal('detailModal', content); }
+
+function updateFilterCounts() { const counts = { all: cementData.types.length, common: cementData.types.filter(t => t.category === 'common').length, sulfate: cementData.types.filter(t => t.category === 'sulfate').length, lowEarly: cementData.types.filter(t=>t.family.startsWith('CEM III')).length }; document.getElementById('filterAll').textContent = `All Types (${counts.all})`; document.getElementById('filterCommon').textContent = `Common (${counts.common})`; document.getElementById('filterSulfate').textContent = `Sulfate Resistant (${counts.sulfate})`; document.getElementById('filterLowEarly').textContent = `Low Early Strength (${counts.lowEarly})`; }
+
+function updateHeroStats() { document.getElementById('totalTypesCount').textContent = cementData.types.length; }
+
+function updateCreditsInfo() { if (cementData.credits) { document.getElementById('preparedBy').textContent = cementData.credits.prepared_by; document.getElementById('preparedEmail').href = `mailto:${cementData.credits.email}`; document.getElementById('preparedEmail').textContent = cementData.credits.email; document.getElementById('checkedBy').textContent = cementData.credits.checked_by; document.getElementById('checkedTitle').textContent = cementData.credits.title; } }
+
+function updateScrollProgress() { const progressBar = document.getElementById('progressBar'); if (!progressBar) return; const scrollTop = window.pageYOffset || document.documentElement.scrollTop; const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight; progressBar.style.width = `${(scrollTop / docHeight) * 100}%`; }
+
+function observeElements() { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate-in'); } }); }, { threshold: 0.1 }); document.querySelectorAll('.card, .section-header, .stat').forEach(el => observer.observe(el)); }
+
+function initializeMobileMenu() { const mobileMenu = document.getElementById('mobileMenu'); const navLinks = document.querySelector('.nav-links'); if (mobileMenu) mobileMenu.addEventListener('click', () => { navLinks.classList.toggle('active'); mobileMenu.classList.toggle('active'); }); }
+// [END OF FULL APP.JS FILE]
+primary-blue)' : 'var(--text-secondary)'};">${sc} ${variant} ${isAvailable ? '✓' : '✗'}</h6><p style="font-size:0.9rem; color:var(--text-secondary);">${data.name}</p></div>`;
+                }).join('')}</div></div>`;
+            }).join('')}
+        </div>
+        <div class="launch-calculator-btn" onclick="launchCalculator('${typeId}')"><i class="fas fa-calculator"></i> Launch Precision Calculator</div>`;
+    openModal('detailModal', content);
+}
+
+function launchCalculator(typeId) {
+    const type = cementData.types.find(t => t.id === typeId);
+    if (!type) return;
+    const inputsHTML = Object.keys(type.composition).map(key => `
+        <div class="input-group">
+            <label for="${key}_so3">SO₃ in ${key.charAt(0).toUpperCase() + key.slice(1)} (%)</label>
+            <input type="number" id="${key}_so3" value="0.5" step="0.01" min="0">
+        </div>`).join('');
+    const content = `
+        <h3>Precision Calculator: ${type.name}</h3>
+        <p>Target Maximum SO₃ in Final Cement: <strong>${type.max_so3}%</strong></p>
+        <div class="calculator-grid">
+            <div>
+                <h4>Raw Material Inputs</h4>
+                ${inputsHTML}
+                <div class="input-group">
+                    <label for="gypsum_purity">Gypsum Purity (%)</label>
+                    <input type="number" id="gypsum_purity" value="90" step="0.1" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="gypsum_type">Gypsum Type</label>
+                    <select id="gypsum_type">
+                        <option value="dihydrate">Dihydrate (CaSO₄·2H₂O)</option>
+                        <option value="hemihydrate">Hemihydrate (CaSO₄·½H₂O)</option>
+                        <option value="anhydrite">Anhydrite (CaSO₄)</option>
+                    </select>
+                </div>
+                <button class="calculate-btn" onclick="calculatePreciseComposition('${typeId}')">Calculate</button>
+            </div>
+            <div id="calculatorResults"><h4>Calculation Results</h4><p>Fill in inputs and click Calculate.</p></div>
+        </div>`;
+    openModal('calculatorModal', content);
+}
+
+function calculatePreciseComposition(typeId) {
+    const type = cementData.types.find(t => t.id === typeId);
+    if (!type) return;
+    const gypsumPurity = parseFloat(document.getElementById('gypsum_purity').value) / 100;
+    const gypsumType = document.getElementById('gypsum_type').value;
+    let so3FromNucleus = 0;
+    for (const key in type.composition) {
+        so3FromNucleus += (parseFloat(document.getElementById(`${key}_so3`).value) / 100) * type.composition[key];
+    }
+    const requiredSO3FromGypsum = type.max_so3 - so3FromNucleus;
+    if (requiredSO3FromGypsum < 0) {
+        document.getElementById('calculatorResults').innerHTML = `<h4>Error</h4><p style="color:red;">SO₃ from raw materials (${so3FromNucleus.toFixed(2)}%) already exceeds the maximum limit of ${type.max_so3}%!</p>`;
+        return;
+    }
+    const mw = cementData.molecularWeights;
+    const so3RatioInPureGypsum = mw.SO3 / mw[gypsumType];
+    const so3RatioInActualGypsum = so3RatioInPureGypsum * gypsumPurity;
+    const totalGypsumToAdd = requiredSO3FromGypsum / so3RatioInActualGypsum;
+    const nucleusPercentage = 100 - totalGypsumToAdd;
+    const finalComposition = {};
+    for (const key in type.composition) {
+        finalComposition[key] = type.composition[key] * (nucleusPercentage / 100);
+    }
+    let resultsHTML = `<h4>Final Cement Composition</h4><p><strong>Required Gypsum (${gypsumType.replace('hydrate', ' hydrate')}): ${totalGypsumToAdd.toFixed(2)}%</strong></p><hr>`;
+    for (const key in finalComposition) {
+        resultsHTML += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${finalComposition[key].toFixed(2)}%</p>`;
+    }
+    const total = totalGypsumToAdd + Object.values(finalComposition).reduce((a, b) => a + b, 0);
+    resultsHTML += `<hr><p><strong>Total: ${total.toFixed(2)}%</strong></p>`;
+    document.getElementById('calculatorResults').innerHTML = resultsHTML;
+}
+
+function updateFilterCounts() {
+    const counts = { all: cementData.types.length, common: cementData.types.filter(t => t.category === 'common').length, sulfate: cementData.types.filter(t => t.category === 'sulfate').length };
+    document.getElementById('filterAll').textContent = `All Types (${counts.all})`;
+    document.getElementById('filterCommon').textContent = `Common (${counts.common})`;
+    document.getElementById('filterSulfate').textContent = `Sulfate Resistant (${counts.sulfate})`;
+}
+
+function updateHeroStats() { document.getElementById('totalTypesCount').textContent = cementData.types.length; }
+function updateCreditsInfo() { /* Function remains the same */ }
+function updateScrollProgress() { /* Function remains the same */ }
+function observeElements() { /* Function remains the same */ }
+function initializeMobileMenu() { /* Function remains the same */ }
+
+// Redundant functions to be removed in a refactor pass, placeholders for now
+function showConstituentDetails(symbol) { console.log(symbol); }
+function showStrengthClassDetails(className) { console.log(className); }
+
