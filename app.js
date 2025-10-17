@@ -26,13 +26,25 @@ function setTheme(theme) { currentTheme = theme; document.documentElement.setAtt
 function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); }
 
 function initializeNavigation() {
+    const navLinksContainer = document.querySelector('.nav-links');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    document.querySelectorAll('.nav-link').forEach(link => {
+    
+    navLinksContainer.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetElement = document.getElementById(link.getAttribute('href').substring(1));
             if (targetElement) { window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' }); }
+            // --- FIX: Close mobile menu on link click ---
+            navLinksContainer.classList.remove('active');
+            mobileMenu.classList.remove('active');
         });
+    });
+
+    mobileMenu.addEventListener('click', () => {
+        navLinksContainer.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
     });
 }
 
@@ -100,7 +112,50 @@ function renderStrengthClasses() { const grid = document.getElementById('strengt
 
 function renderRequirements() { const grid = document.getElementById('requirementsGrid'); if (!grid) return; const requirements = [{ title: 'Chemical Requirements', icon: 'fas fa-flask', items: ['Loss on ignition', 'Insoluble residue', 'Sulfate content (SO₃)', 'Chloride content'] }, { title: 'Physical Requirements', icon: 'fas fa-ruler', items: ['Setting time', 'Soundness (Expansion)', 'Compressive strength', 'Fineness'] }]; grid.innerHTML = requirements.map(r => `<div class="card"><div class="card-header"><div><div class="card-title">${r.title}</div><div class="card-subtitle">BS EN 197-1:2011</div></div><div class="card-icon"><i class="${r.icon}"></i></div></div><div class="card-content"><ul style="margin: 0; padding-left: 20px;">${r.items.map(item => `<li>${item}</li>`).join('')}</ul></div></div>`).join(''); }
 
-function showCementTypeDetails(typeId) { const type = cementData.types.find(t => t.id === typeId); if (!type) return; const content = `<h2 style="color: var(--primary-blue);">${type.name}</h2><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;"><div><h4>Info</h4><p><strong>Family:</strong> ${type.family}</p><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p><strong>Category:</strong> ${type.category}</p></div><div><h4>Composition (Nucleus)</h4><div class="composition-bar">${renderCompositionBar(type.composition)}</div>${Object.entries(type.composition).map(([c, p]) => `<p><strong>${c.charAt(0).toUpperCase() + c.slice(1)}:</strong> ${p}%</p>`).join('')}</div></div><div style="margin-bottom: 20px;"><h4>Chemical Requirements</h4><div style="background: var(--surface); padding: 15px; border-radius: 8px;">${Object.entries(type.chemical_requirements || {}).map(([r, v]) => `<p><strong>${r.replace(/_/g, ' ').toUpperCase()}:</strong> ${v}</p>`).join('')}</div></div><div class="launch-calculator-btn" onclick="launchCalculator('${typeId}')"><i class="fas fa-calculator"></i> Launch Precision Calculator</div>`; openModal('detailModal', content); }
+function showCementTypeDetails(typeId) {
+    const type = cementData.types.find(t => t.id === typeId);
+    if (!type) return;
+
+    // --- RESTORED: Detailed strength variant grid ---
+    const strengthDetailsHTML = type.available_strength_classes.map(sc => {
+        const classData = cementData.strengthClasses[sc];
+        return `<div style="background: var(--surface); margin: 15px 0; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
+            <h5 style="color: var(--primary-blue); margin-bottom: 15px;">Class ${sc} MPa</h5>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            ${Object.entries(classData.variants).map(([variant, data]) => {
+                const isCemThree = type.family.startsWith('CEM III');
+                const isAvailable = isCemThree ? true : (variant !== 'L');
+                return `<div style="padding: 15px; border-radius: 8px; border: 2px solid ${isAvailable ? 'var(--primary-blue)' : 'var(--border)'}; ${!isAvailable && 'opacity: 0.5;'}">
+                    <h6 style="color: ${isAvailable ? 'var(--primary-blue)' : 'var(--text-secondary)'}; margin-bottom: 10px;">${sc} ${variant} ${isAvailable ? '✓' : '✗'}</h6>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">${data.name}</p>
+                    <p style="font-size: 0.85rem;">
+                        <strong>${data.early_days}-day:</strong> ≥${data.early_min} MPa<br>
+                        <strong>28-day:</strong> ${data.standard_min}${data.standard_max ? ` - ${data.standard_max}` : '+'} MPa<br>
+                        <strong>Setting:</strong> ≥${data.setting_time} min
+                    </p>
+                    ${isAvailable ? `<div style="margin-top: 10px;"><p style="font-size: 0.8rem; font-weight: 500; color: var(--primary-blue);">Applications:</p><ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 5px 0 0 15px;">${data.applications.slice(0, 2).map(app => `<li>${app}</li>`).join('')}</ul></div>` : ''}
+                </div>`;
+            }).join('')}
+            </div>
+        </div>`;
+    }).join('');
+
+    const content = `
+        <h2 style="color: var(--primary-blue);">${type.name}</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <div><h4>Info</h4><p><strong>Family:</strong> ${type.family}</p><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p><strong>Category:</strong> ${type.category}</p></div>
+            <div><h4>Composition (Nucleus)</h4><div class="composition-bar">${renderCompositionBar(type.composition)}</div>${Object.entries(type.composition).map(([c, p]) => `<p><strong>${c.charAt(0).toUpperCase() + c.slice(1)}:</strong> ${p}%</p>`).join('')}</div>
+        </div>
+        <div style="margin-bottom: 20px;"><h4>Chemical Requirements</h4><div style="background: var(--surface); padding: 15px; border-radius: 8px;">${Object.entries(type.chemical_requirements || {}).map(([r, v]) => `<p><strong>${r.replace(/_/g, ' ').toUpperCase()}:</strong> ${v}</p>`).join('')}</div></div>
+        <div style="margin-bottom: 30px;">
+            <h4>Available Strength Classes & Variants</h4>
+            <div style="font-size: 0.9rem; padding: 10px; background: var(--surface); border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid var(--border);"><strong>Key:</strong> <span style="color: var(--primary-blue); font-weight: bold;">✓</span> = Available &nbsp;|&nbsp; <span style="color: var(--text-secondary); font-weight: bold;">✗</span> = Not Available</div>
+            ${strengthDetailsHTML}
+        </div>
+        <div class="launch-calculator-btn" onclick="launchCalculator('${typeId}')"><i class="fas fa-calculator"></i> Launch Precision Calculator</div>
+    `;
+    openModal('detailModal', content);
+}
 
 function launchCalculator(typeId) { const type = cementData.types.find(t => t.id === typeId); if (!type) return; const inputsHTML = Object.keys(type.composition).map(key => `<div class="input-group"><label for="${key}_so3">SO₃ in ${key.charAt(0).toUpperCase() + key.slice(1)} (%)</label><input type="number" id="${key}_so3" value="0.5" step="0.01" min="0"></div>`).join(''); const content = `<h3>Calculator: ${type.name}</h3><p>Target Max SO₃: <strong>${type.max_so3}%</strong></p><div class="calculator-grid"><div><h4>Raw Material Inputs</h4>${inputsHTML}<div class="input-group"><label for="gypsum_purity">Gypsum Purity (%)</label><input type="number" id="gypsum_purity" value="90" step="0.1" min="0"></div><div class="input-group"><label for="gypsum_type">Gypsum Type</label><select id="gypsum_type"><option value="dihydrate">Dihydrate</option><option value="hemihydrate">Hemihydrate</option><option value="anhydrite">Anhydrite</option></select></div><button class="calculate-btn" onclick="calculatePreciseComposition('${typeId}')">Calculate</button></div><div id="calculatorResults"><h4>Results</h4><p>Fill inputs and click Calculate.</p></div></div>`; openModal('calculatorModal', content); }
 
