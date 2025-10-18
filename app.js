@@ -81,18 +81,29 @@ function openModal(modalId, content) {
     modal.style.display = 'block';
 }
 
+// --- استبدل هذه الدالة بالكامل ---
 function renderCementTypes() {
     const grid = document.getElementById('cementTypesGrid');
     if (!grid) return;
     let filteredTypes = cementData.types;
-    if (currentFilter === 'lowEarly') { filteredTypes = cementData.types.filter(type => type.family.startsWith('CEM III')); }
-    else if (currentFilter !== 'all') { filteredTypes = cementData.types.filter(type => type.category === currentFilter); }
+    if (currentFilter === 'lowEarly') {
+        filteredTypes = cementData.types.filter(type => type.family.startsWith('CEM III'));
+    } else if (currentFilter !== 'all') {
+        filteredTypes = cementData.types.filter(type => type.category === currentFilter);
+    }
     if (searchTerm) {
         const searchLower = searchTerm.trim().toLowerCase();
-        if (searchLower.length > 0) { filteredTypes = filteredTypes.filter(type => [type.name, type.family, type.description, ...type.applications].join(' ').toLowerCase().includes(searchLower)); }
+        if (searchLower.length > 0) {
+            filteredTypes = filteredTypes.filter(type => [type.name, type.family, type.description, ...type.applications].join(' ').toLowerCase().includes(searchLower));
+        }
     }
     grid.innerHTML = filteredTypes.map(type => `<div class="card" onclick="showCementTypeDetails('${type.id}')"><div class="card-header"><div><div class="card-title">${type.name}</div><div class="card-subtitle">${type.family} Family</div></div><div class="card-icon"><i class="fas fa-cube"></i></div></div><div class="card-content"><p><strong>Clinker:</strong> ${type.clinker}</p>${type.additive ? `<p><strong>Additive:</strong> ${type.additive}</p>` : ''}<p>${type.description}</p><div class="composition-bar">${renderCompositionBar(type.composition)}</div><p style="color: var(--primary-blue); font-weight: 500; margin-top: 15px;"><i class="fas fa-mouse-pointer"></i> Click for details & calculator</p></div><div class="card-tags">${type.applications.slice(0, 2).map(app => `<span class="tag">${app}</span>`).join('')}${type.applications.length > 2 ? `<span class="tag">+${type.applications.length - 2} more</span>` : ''}</div></div>`).join('');
+
+    // --- هذا هو الإصلاح ---
+    // بعد إنشاء البطاقات الجديدة، نقوم باستدعاء مراقب الحركة مرة أخرى
+    observeElements();
 }
+
 
 function renderCompositionBar(composition) {
     if (!composition) return '';
@@ -159,7 +170,14 @@ function updateFilterCounts() { const counts = { all: cementData.types.length, c
 
 function updateHeroStats() { document.getElementById('totalTypesCount').textContent = cementData.types.length; }
 
-function updateCreditsInfo() { if (cementData.credits) { document.getElementById('preparedBy').textContent = cementData.credits.prepared_by; document.getElementById('preparedEmail').href = `mailto:${cementData.credits.email}`; document.getElementById('preparedEmail').textContent = cementData.credits.email; document.getElementById('checkedBy').textContent = cementData.credits.checked_by; document.getElementById('checkedTitle').textContent = cementData.credits.title; } }
+function updateCreditsInfo() {
+    if (cementData.credits) {
+        document.getElementById('preparedBy').textContent = cementData.credits.prepared_by;
+        const emailEl = document.getElementById('preparedEmail');
+        emailEl.textContent = cementData.credits.email;
+        emailEl.href = `mailto:${cementData.credits.email}`;
+    }
+}
 
 function updateScrollProgress() { const progressBar = document.getElementById('progressBar'); if (!progressBar) return; const scrollTop = window.pageYOffset || document.documentElement.scrollTop; const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight; progressBar.style.width = `${(scrollTop / docHeight) * 100}%`; }
 
